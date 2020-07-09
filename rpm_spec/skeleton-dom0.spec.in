@@ -1,4 +1,4 @@
-Name: qubes-skeleton
+Name: qubes-skeleton-dom0
 Version: @VERSION@
 Release: @REL@%{?dist}
 
