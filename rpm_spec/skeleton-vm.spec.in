@@ -1,0 +1,28 @@
+Name: qubes-skeleton-vm
+Version: @VERSION@
+Release: @REL@%{?dist}
+
+Summary: Qubes Skeleton package for VM
+License: GPLv2+
+URL: https://www.qubes-os.org/
+
+Source0: %{name}-%{version}.tar.gz
+
+%description
+Qubes Skeleton package for VM.
+
+%prep
+%setup -q
+
+#%build
+#something to build?
+
+%install
+make install-vm DESTDIR=$RPM_BUILD_ROOT
+
+%files
+/usr/lib/qubes/skeleton/README
+/usr/lib/qubes/skeleton/skeleton.sh
+
+%changelog
+@CHANGELOG@

@@ -1,0 +1,28 @@
+Name: qubes-skeleton
+Version: @VERSION@
+Release: @REL@%{?dist}
+
+Summary: Qubes Skeleton package for dom0
+License: GPLv2+
+URL: https://www.qubes-os.org/
+
+Source0: %{name}-%{version}.tar.gz
+
+%description
+Qubes Skeleton package for dom0.
+
+%prep
+%setup -q
+
+#%build
+#something to build?
+
+%install
+make install-dom0 DESTDIR=$RPM_BUILD_ROOT
+
+%files
+/usr/lib/qubes/skeleton/README
+/usr/lib/qubes/skeleton/skeleton.sh
+
+%changelog
+@CHANGELOG@
