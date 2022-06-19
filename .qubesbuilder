@@ -1,0 +1,8 @@
+host:
+  rpm:
+    build:
+    - rpm_spec/skeleton-dom0.spec
+vm:
+  rpm:
+    build:
+    - rpm_spec/skeleton-vm.spec
