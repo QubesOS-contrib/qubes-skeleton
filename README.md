@@ -73,6 +73,10 @@ section and the Debian `rules` file call one of these with the appropriate
 `DESTDIR`. Add every file you want packaged to the appropriate target here,
 then list it in the corresponding spec `%files` section or `.install` file.
 
+> **Important:** Makefile recipe lines must be indented with a **tab** character,
+> not spaces. Most editors default to spaces so make sure yours inserts a real tab.
+> A space-indented recipe line causes `make: *** missing separator` errors.
+
 ```makefile
 install-common:
 	install -m 775 -D skeleton.sh $(DESTDIR)/usr/lib/qubes/skeleton/skeleton.sh
@@ -149,6 +153,20 @@ error: Empty %files file .../debugsourcefiles.list
 Keep this line for any package that installs only scripts or data files.
 Remove it if the package ever builds and installs compiled binaries (RPM
 will then produce useful debug packages automatically).
+
+An alternative for pure script or data packages is to declare the package
+as architecture-independent instead:
+
+```spec
+BuildArch: noarch
+```
+
+`BuildArch: noarch` tells RPM the package contains no compiled binaries,
+which also prevents the empty debugsource error and additionally ensures the
+package is built once and installable on any architecture. Use this when the
+package truly has no arch-specific content. Keep `%global debug_package %{nil}`
+when you want to suppress debug sub-packages but still produce an arch-specific
+package.
 
 The placeholders replaced by the builder before the spec is used are:
 
@@ -363,16 +381,21 @@ distributions:
 components:
   - skeleton:
       branch: master
-      # Override the URL with a local path to test uncommitted changes:
+      # Override the URL with a local path to your git clone.
+      # Note: the builder fetches the latest commit of `branch` from that
+      # local repo, so only committed changes are picked up. Uncommitted
+      # working-tree changes are ignored so commit first, then build.
       url: /path/to/your/git/skeleton
       # GPG fingerprint(s) used to verify signed tags for this component.
       # When omitted, the keys from the top-level git.maintainers list are used.
       # Setting this overrides those defaults for this component only.
       maintainers:
         - AABBCCDDEEFF00112233445566778899AABBCCDD
-
-less-secure-signed-commits-sufficient:
-  - skeleton
+      # verification-mode controls how the builder verifies the source.
+      # The default requires a signed tag on the fetched commit (most secure).
+      # "less-secure-signed-commits-sufficient" accepts a signed commit instead,
+      # which is useful during development when you haven't created a release tag yet.
+      verification-mode: less-secure-signed-commits-sufficient
 
 repository-publish:
   components: current-testing
@@ -464,8 +487,11 @@ the built RPM from the builder qube (`work-qubesos`) to dom0 using
 
 ```bash
 # Run in dom0
+# artifacts/repository/ always contains only the latest built version.
+# The build stage repopulates it on each run, so there is never more than
+# one RPM file per component version.
 qvm-run --pass-io work-qubesos \
-    'cat ~/qubes-builderv2/artifacts/components/skeleton/*/host-fc41/build/rpm/qubes-skeleton-dom0-*.rpm' \
+    'cat ~/qubes-builderv2/artifacts/repository/host-fc41/skeleton_*/qubes-skeleton-dom0-*.rpm' \
     | sudo tee /tmp/qubes-skeleton-dom0.rpm > /dev/null
 
 sudo rpm -ivh /tmp/qubes-skeleton-dom0.rpm
@@ -489,7 +515,7 @@ from the builder qube and install inside it.
 # Start a fresh dispvm based on fedora-42 or use a dedicated testing AppVM
 # (replace 'test-fedora-42' with the actual running VM name)
 qvm-copy-to-vm test-fedora-42 \
-    ~/qubes-builderv2/artifacts/components/skeleton/*/vm-fc42/build/rpm/qubes-skeleton-vm-*.rpm
+    ~/qubes-builderv2/artifacts/repository/vm-fc42/skeleton_*/qubes-skeleton-vm-*.rpm
 
 # Inside the VM
 sudo rpm -ivh ~/QubesIncoming/work-qubesos/qubes-skeleton-vm-*.rpm
@@ -503,7 +529,7 @@ cat /usr/lib/qubes/skeleton/README
 ```bash
 # Start a fresh dispvm based on debian-12 or use a dedicated testing AppVM
 qvm-copy-to-vm test-bookworm \
-    ~/qubes-builderv2/artifacts/components/skeleton/*/vm-bookworm/build/deb/qubes-skeleton_*.deb
+    ~/qubes-builderv2/artifacts/repository/vm-bookworm/skeleton_*/qubes-skeleton_*.deb
 
 # Inside the VM
 sudo dpkg -i ~/QubesIncoming/work-qubesos/qubes-skeleton_*.deb
