@@ -1,3 +1,4 @@
+%global debug_package %{nil}
 Name: qubes-skeleton-dom0
 Version: @VERSION@
 Release: @REL@%{?dist}

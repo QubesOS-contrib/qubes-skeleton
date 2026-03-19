@@ -1,0 +1,9 @@
+#!/usr/bin/make -f
+
+export DESTDIR=$(shell pwd)/debian/tmp
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	make install-vm

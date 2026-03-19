@@ -1,0 +1,13 @@
+Source: qubes-skeleton
+Section: admin
+Priority: optional
+Maintainer: Qubes OS <user@qubes-os.org>
+Build-Depends: debhelper (>= 10), make
+Standards-Version: 4.4.0.1
+Homepage: https://www.qubes-os.org
+
+Package: qubes-skeleton
+Architecture: all
+Depends: ${misc:Depends}
+Description: Qubes skeleton VM package
+ Example component for Qubes OS.

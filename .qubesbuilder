@@ -6,3 +6,6 @@ vm:
   rpm:
     build:
     - rpm_spec/skeleton-vm.spec
+  deb:
+    build:
+    - debian
