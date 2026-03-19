@@ -8,3 +8,5 @@ include:
 #  project: QubesOS/qubes-continuous-integration
 - file: /r4.3/gitlab-vm-fedora.yml
   project: QubesOS/qubes-continuous-integration
+- file: /r4.3/gitlab-vm-debian.yml
+  project: QubesOS/qubes-continuous-integration
